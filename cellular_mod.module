@@ -1,0 +1,102 @@
+<?php
+/**
+ * @file
+ * Cellular Module
+ *
+ * @author Adam Blankenship <i.adambear@gmail.com>
+  \n*
+ * @see http://live-cellular.gotpantheon.com/cellular-ui
+ */
+/**
+ * Implements hook_form_alter().
+  function cellular_mod_form_alter(&$form, &$form_state, $form_id) {
+  // dpm($form);
+  switch ($form_id) {
+  case '':
+
+  break;
+  }
+  }
+ */
+$inc_path = drupal_get_path('module', 'cellular_mod') . '/inc/';
+$required = array(
+  'cellular_mod_library.inc',
+  'cellular_mod_blocks.inc',
+  'cellular_mod_datetime.inc',
+  'cellular_mod_image_style.inc',
+);
+
+foreach ($required as $inc) {
+  require_once $inc_path . $inc;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function cellular_mod_menu() {
+  $items['admin/config/user-interface/cellularui'] = array(
+    'title' => 'Cellular UI',
+    'description' => 'Cellular UI settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cellularui_settings_form'),
+    'access arguments' => array('administer cellularui settings'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'inc/cellular_mod_admin.inc',
+  );
+  return $items;
+}
+
+function cellular_mod_init() {
+  if (theme_get_setting('gsap') == 1) {
+    drupal_add_library('cellular', 'gsap');
+  }
+}
+
+/**
+ * Implements template_preprocess_page().
+ */
+function cellular_mod_preprocess_page(&$vars) {
+
+}
+
+/**
+ * Output links for Login/My Account/Logout
+ */
+function cellular_mod_user_link() {
+
+  global $user;
+  /*
+    unset($_GET['destination']);
+    drupal_static_reset('drupal_get_destination');
+    drupal_get_destination();
+   */
+  $params = array('query' => drupal_get_destination());
+  $output = '<div class="user-links">';
+  if (user_is_logged_in()) {
+    $output .= t('<a href="@user-account">My Account</a> | <a href="@user-logout">Logout</a>', array(
+      '@user-logout' => url('user/logout', $params),
+      '@user-account' => url('user/' . $user->uid),
+    ));
+  }
+  else {
+    $output .= t('<a href="@user-login" class="@class">Login</a> / <a href="@user-register">Register</a>', array(
+      '@user-login' => url('user/login', $params),
+      '@user-register' => url('user/register'),
+      '@class' => module_exists('colorbox_node') && theme_get_setting('use_colorbox')
+        ? 'colorbox-node' : '',
+    ));
+  }
+  $output.= '</div>';
+
+  return $output;
+}
+
+/**
+ * Returns full Main Menu tree instead of top-level only links.
+ */
+function cellular_mod_main_menu() {
+// Render the full main menu tree, use css / js to show/hide sub-menus.
+  $output = menu_tree_output(menu_tree_all_data('main-menu'));
+
+  return drupal_render($output);
+}

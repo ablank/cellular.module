@@ -1,0 +1,12 @@
+<?php
+
+function cellular_mod_uninstall() {
+  $image_styles = array(
+    'cellular_avatar',
+    'cellular_banner',
+  );
+  foreach ($image_styles as $style) {
+    image_style_delete(image_style_load($style));
+    image_style_flush($style);
+  }
+}

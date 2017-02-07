@@ -1,0 +1,4 @@
+name = Cellular Module
+description = "UI integration Blocks & Fields for Cellular theme."
+core = 7.x
+package = Cellular
